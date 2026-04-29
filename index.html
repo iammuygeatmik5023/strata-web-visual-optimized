@@ -1,0 +1,191 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Strata Web Visual</title>
+  <link rel="icon" href="data:," />
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <div id="appRoot">
+    <canvas id="stage"></canvas>
+
+    <aside id="panel" class="panel">
+      <div class="panel-head">
+        <select id="presetSelect"></select>
+        <span>Preset</span>
+      </div>
+
+      <div class="section-title">Input</div>
+      <div class="save-row input-row">
+        <select id="inputModeSelect">
+          <option value="random">Random Generator</option>
+          <option value="sound">Sound Input (Microphone)</option>
+        </select>
+      </div>
+      <div class="save-row input-row">
+        <select id="audioReactiveMode">
+          <option value="classic">Classic Reactive</option>
+          <option value="fracture_sync">Fracture Sync</option>
+        </select>
+      </div>
+      <div class="control-row mode-intensity-row">
+        <input id="fractureIntensity" type="range" min="0.5" max="1.5" step="0.01" />
+        <div class="control-meta"><span id="fractureIntensityValue"></span><span>Fracture Intensity</span></div>
+      </div>
+      <div class="control-row mode-intensity-row">
+        <input id="fractureFrequency" type="range" min="0.5" max="2.5" step="0.01" />
+        <div class="control-meta"><span id="fractureFrequencyValue"></span><span>Glitch Frequency</span></div>
+      </div>
+      <div id="micStatus" class="status-line">Input: Random</div>
+
+      <details class="accordion-item" id="audioLaneAccordion" open>
+        <summary class="section-title accordion-summary">Audio Lanes</summary>
+        <div class="accordion-content lane-panel">
+          <div class="lane-row">
+            <span class="lane-label">Kick</span>
+            <div class="lane-meter"><div id="laneKickFill" class="lane-fill"></div></div>
+            <span id="laneKickValue" class="lane-value">0.00</span>
+            <span id="laneKickOnset" class="lane-onset"></span>
+          </div>
+          <div class="lane-row">
+            <span class="lane-label">Snare</span>
+            <div class="lane-meter"><div id="laneSnareFill" class="lane-fill"></div></div>
+            <span id="laneSnareValue" class="lane-value">0.00</span>
+            <span id="laneSnareOnset" class="lane-onset"></span>
+          </div>
+          <div class="lane-row">
+            <span class="lane-label">Hat</span>
+            <div class="lane-meter"><div id="laneHatFill" class="lane-fill"></div></div>
+            <span id="laneHatValue" class="lane-value">0.00</span>
+            <span id="laneHatOnset" class="lane-onset"></span>
+          </div>
+          <div class="lane-row">
+            <span class="lane-label">Sustain</span>
+            <div class="lane-meter"><div id="laneSustainFill" class="lane-fill"></div></div>
+            <span id="laneSustainValue" class="lane-value">0.00</span>
+            <span id="laneSustainOnset" class="lane-onset"></span>
+          </div>
+          <div class="lane-sensitivity">
+            <div class="control-row">
+              <input id="laneKickSensitivity" type="range" min="0.5" max="2.5" step="0.01" />
+              <div class="control-meta"><span id="laneKickSensitivityValue"></span><span>Kick Sensitivity</span></div>
+            </div>
+            <div class="control-row">
+              <input id="laneSnareSensitivity" type="range" min="0.5" max="2.5" step="0.01" />
+              <div class="control-meta"><span id="laneSnareSensitivityValue"></span><span>Snare Sensitivity</span></div>
+            </div>
+            <div class="control-row">
+              <input id="laneHatSensitivity" type="range" min="0.5" max="2.5" step="0.01" />
+              <div class="control-meta"><span id="laneHatSensitivityValue"></span><span>Hat Sensitivity</span></div>
+            </div>
+            <div class="control-row">
+              <input id="laneSustainSensitivity" type="range" min="0.5" max="2.5" step="0.01" />
+              <div class="control-meta"><span id="laneSustainSensitivityValue"></span><span>Sustain Sensitivity</span></div>
+            </div>
+          </div>
+        </div>
+      </details>
+
+      <details class="accordion-item" id="effectsAccordion" open>
+        <summary class="section-title accordion-summary">Effects</summary>
+        <div class="accordion-content">
+          <div id="effectToggleGrid" class="effect-toggle-grid">
+            <label class="effect-toggle-item"><input type="checkbox" data-effect-key="bloom" checked /><span>Bloom</span></label>
+            <label class="effect-toggle-item"><input type="checkbox" data-effect-key="void" checked /><span>Void</span></label>
+            <label class="effect-toggle-item"><input type="checkbox" data-effect-key="ring" checked /><span>Ring</span></label>
+            <label class="effect-toggle-item"><input type="checkbox" data-effect-key="stack" checked /><span>Stack</span></label>
+            <label class="effect-toggle-item"><input type="checkbox" data-effect-key="bokeh" checked /><span>Bokeh</span></label>
+            <label class="effect-toggle-item"><input type="checkbox" data-effect-key="thermal" checked /><span>Thermal</span></label>
+            <label class="effect-toggle-item"><input type="checkbox" data-effect-key="drip" checked /><span>Drip</span></label>
+            <label class="effect-toggle-item"><input type="checkbox" data-effect-key="frame" checked /><span>Frame</span></label>
+            <label class="effect-toggle-item"><input type="checkbox" data-effect-key="shear" checked /><span>Shear</span></label>
+            <label class="effect-toggle-item"><input type="checkbox" data-effect-key="fiber" checked /><span>Fiber</span></label>
+            <label class="effect-toggle-item"><input type="checkbox" data-effect-key="dust" checked /><span>Dust</span></label>
+          </div>
+        </div>
+      </details>
+
+      <details class="accordion-item" id="visualAccordion" open>
+        <summary class="section-title accordion-summary">Visual</summary>
+        <div class="accordion-content">
+          <div class="control-row">
+            <input id="renderScale" type="range" min="1" max="2.2" step="0.01" />
+            <div class="control-meta"><span id="renderScaleValue"></span><span>Render Scale</span></div>
+          </div>
+          <div class="control-row">
+            <input id="contrast" type="range" min="0.5" max="3" step="0.01" />
+            <div class="control-meta"><span id="contrastValue"></span><span>Contrast</span></div>
+          </div>
+          <div class="control-row">
+            <input id="paperWhite" type="range" min="0" max="1" step="0.01" />
+            <div class="control-meta"><span id="paperWhiteValue"></span><span>Paper White</span></div>
+          </div>
+          <div class="control-row">
+            <input id="backgroundTone" type="range" min="0" max="1.2" step="0.01" />
+            <div class="control-meta"><span id="backgroundToneValue"></span><span>Background Tone</span></div>
+          </div>
+          <div class="control-row">
+            <input id="paperGrain" type="range" min="0" max="2.5" step="0.01" />
+            <div class="control-meta"><span id="paperGrainValue"></span><span>Paper Grain</span></div>
+          </div>
+          <div class="control-row">
+            <input id="exposure" type="range" min="0.2" max="3" step="0.01" />
+            <div class="control-meta"><span id="exposureValue"></span><span>Exposure</span></div>
+          </div>
+          <div class="control-row">
+            <input id="bloomStrength" type="range" min="0" max="2.5" step="0.01" />
+            <div class="control-meta"><span id="bloomStrengthValue"></span><span>Bloom</span></div>
+          </div>
+          <div class="control-row">
+            <input id="blurStrength" type="range" min="0" max="2.5" step="0.01" />
+            <div class="control-meta"><span id="blurStrengthValue"></span><span>Blur</span></div>
+          </div>
+          <div class="control-row">
+            <input id="overlapEmphasis" type="range" min="0" max="3" step="0.01" />
+            <div class="control-meta"><span id="overlapEmphasisValue"></span><span>Overlap Emphasis</span></div>
+          </div>
+          <div class="control-row">
+            <input id="thermalBoost" type="range" min="0" max="2" step="0.01" />
+            <div class="control-meta"><span id="thermalBoostValue"></span><span>Thermal Boost</span></div>
+          </div>
+          <div class="control-row">
+            <input id="opacity" type="range" min="0.2" max="1" step="0.01" />
+            <div class="control-meta"><span id="opacityValue"></span><span>Opacity</span></div>
+          </div>
+
+          <div class="button-row">
+            <button id="randomizeBtn">Randomize Visual</button>
+            <button id="resetBtn">Reset Scene</button>
+            <button id="bleachBtn">Bleach</button>
+            <button id="pauseBtn">Pause</button>
+            <button id="captureBtn">Capture PNG</button>
+            <button id="fullscreenBtn">Fullscreen</button>
+          </div>
+        </div>
+      </details>
+
+      <details class="accordion-item" id="savedPresetAccordion" open>
+        <summary class="section-title accordion-summary">Saved Preset</summary>
+        <div class="accordion-content">
+          <div class="save-row save-row-name">
+            <input id="userPresetName" type="text" maxlength="32" placeholder="Preset name" />
+            <button id="savePresetBtn">Save</button>
+          </div>
+          <div class="save-row save-row-actions">
+            <select id="savedPresetSelect"></select>
+            <button id="loadPresetBtn">Load</button>
+            <button id="deletePresetBtn">Delete</button>
+          </div>
+        </div>
+      </details>
+
+      <div class="section-title">Runtime</div>
+      <pre id="runtimeText"></pre>
+    </aside>
+  </div>
+
+  <script type="module" src="./app.js?v=20260314-01"></script>
+</body>
+</html>
